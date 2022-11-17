@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../viewModel/view_model_music_cubit.dart';
@@ -23,29 +26,59 @@ class HomeMusic extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: cubit.assetsAudioPlayer.builderRealtimePlayingInfos(
-                  builder: (context, realtimePlayingInfos) {
-                if (realtimePlayingInfos != null) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      linearMusic(cubit, realtimePlayingInfos, context),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      iconsController(cubit),
-                    ],
-                  );
-                } else {
-                  return Container();
-                }
-              }),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                child: cubit.assetsAudioPlayer.builderRealtimePlayingInfos(
+                    builder: (context, realtimePlayingInfos) {
+                  if (realtimePlayingInfos != null) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        animationLottie(context),
+                        partOfMusic(cubit, realtimePlayingInfos, context),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  LottieBuilder animationLottie(BuildContext context) {
+    return LottieBuilder.asset(
+      "assets/images/play.json",
+      width: MediaQuery.of(context).size.width,
+    );
+  }
+
+  Column partOfMusic(ViewModelMusicCubit cubit,
+      RealtimePlayingInfos realtimePlayingInfos, BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          "${realtimePlayingInfos.current!.audio.audio.metas.artist}",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        linearMusic(cubit, realtimePlayingInfos, context),
+        const SizedBox(
+          height: 20,
+        ),
+        iconsController(cubit),
+      ],
     );
   }
 
